@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:presentation_sample/effect.dart';
 import 'package:presentation_sample/mvvm/provider/view_model_provider.dart';
+import 'package:presentation_sample/mvvm/sample_effect.dart';
+import 'package:provider/provider.dart';
 
 import '../sample_view_model.dart';
 
@@ -14,7 +17,7 @@ class DataScreen extends StatelessWidget {
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              renderProcessedData(viewModel),
+              renderState(viewModel),
               FloatingActionButton(
                 onPressed: () {
                   viewModel.counterAdd();
@@ -22,6 +25,7 @@ class DataScreen extends StatelessWidget {
                 child: const Text("Add"),
               ),
               renderCount(viewModel),
+              renderEffect(viewModel),
             ],
           ),
         )
@@ -45,9 +49,9 @@ class DataScreen extends StatelessWidget {
     );
   }
 
-  StreamBuilder<String> renderProcessedData(DataViewModel viewModel) {
+  StreamBuilder<String> renderState(DataViewModel viewModel) {
     return StreamBuilder<String>(
-      stream: viewModel.processedDataStream,
+      stream: viewModel.stateSteam,
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -58,6 +62,28 @@ class DataScreen extends StatelessWidget {
         return Center(
           child: Text(snapshot.data ?? 'No data'),
         );
+      },
+    );
+  }
+
+  StreamBuilder<OneTimeEffect<SampleEffect>> renderEffect(DataViewModel viewModel) {
+    return StreamBuilder<OneTimeEffect<SampleEffect>>(
+      stream: viewModel.effectSteam,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final effect = snapshot.data!.getContentIfNotHandled();
+          if (effect != null && effect is NewCount) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final snackBar = SnackBar(
+                content: Text('new count: ${effect.count}'),
+                duration: const Duration(milliseconds: 600),
+              );
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            });
+          }
+        }
+        return const SizedBox();
       },
     );
   }
