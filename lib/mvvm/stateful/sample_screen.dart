@@ -22,6 +22,8 @@ class _DataState extends State<DataScreen> {
   void initState() {
     super.initState();
     viewModel = DataViewModel(DataRepository());
+    // when using a stateful widget there is the option of subscribing to viewmodel streams here.
+    // for more usability it seems easier to do it with StreamBuilder as we can also build whatever we need.
     //_subscribeToSnackBarStream();
   }
 
@@ -112,7 +114,7 @@ class _DataState extends State<DataScreen> {
       if (effect != null && effect is NewCount) {
         _showSnackBar(effect);
       }
-    });
+    }, onError: (error) {}, onDone: () {}, cancelOnError: false);
   }
 
   void _showSnackBar(NewCount effect) {

@@ -6,6 +6,7 @@ import 'package:presentation_sample/sample_repository.dart';
 
 class DataViewModel extends BaseEffectViewModel<String, SampleEffect> {
   final DataRepository _repository;
+  // this is an example of using 2 different states in same ViewModel or Cubit etc. Should be in a separate viewmodel.
   final StreamController<int> _counterController = StreamController<int>();
   int _counter = 0;
 
