@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:presentation_sample/effect.dart';
 import 'package:presentation_sample/mvvm/provider/view_model_provider.dart';
 import 'package:presentation_sample/mvvm/sample_effect.dart';
-import 'package:provider/provider.dart';
 
 import '../sample_view_model.dart';
 
@@ -74,17 +73,21 @@ class DataScreen extends StatelessWidget {
           final effect = snapshot.data!.getContentIfNotHandled();
           if (effect != null && effect is NewCount) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              final snackBar = SnackBar(
-                content: Text('new count: ${effect.count}'),
-                duration: const Duration(milliseconds: 600),
-              );
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              _showSnackBar(context, effect);
             });
           }
         }
         return const SizedBox();
       },
     );
+  }
+
+  void _showSnackBar(BuildContext context, NewCount effect) {
+    final snackBar = SnackBar(
+      content: Text('new count: ${effect.count}'),
+      duration: const Duration(milliseconds: 400),
+    );
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
